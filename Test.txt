@@ -1,0 +1,3 @@
+Die Fibonaccizahl von 2 ist 1
+Zahlen, von 12 bis 12, die durch 12 Teilbar sind:
+[12]
