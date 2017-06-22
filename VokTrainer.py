@@ -22,33 +22,35 @@ re = []
 rda = []
 rea = []
 path = ""
+lineinfile = 0
 
 def help():
     print("help")
 
-def ask_window():
-    ask = tk.Tk()
-    ask.title("VokTrainer")
-    ask.configure(background="white")
-    ask.resizable(0,0)
-    b1 = tk.Button(ask, text="Choose directory", command=partial(askdir, ask), background="white")
-    b1.bind("<Return>", partial(askdir, ask))
-    b1.pack(pady=5)
-    ask.mainloop()
+
+# def ask_window():
+#     ask = tk.Tk()
+#     ask.title("VokTrainer")
+#     ask.configure(background="white")
+#     ask.resizable(0,0)
+#     b1 = tk.Button(ask, text="Choose directory", command=partial(askdir, ask), background="white")
+#     b1.bind("<Return>", partial(askdir, ask))
+#     b1.pack(pady=5)
+#     ask.mainloop()
 
 
-def askdir(ask, event=None):
-    global directory
-    global chosen
-    directory = tkf.askdirectory(initialdir="C:\\Voktrainer")
-    if directory == "":
-        chosen = False
-    else:
-        print(directory)
-        chosen = True
-    print(chosen)
-    ask.destroy()
-    init_liste()
+# def askdir(ask, event=None):
+#     global directory
+#     global chosen
+#     directory = tkf.askdirectory(initialdir="C:\\Voktrainer")
+#     if directory == "":
+#         chosen = False
+#     else:
+#         print(directory)
+#         chosen = True
+#     print(chosen)
+#     ask.destroy()
+#     init_liste()
 
 
 def init_liste():
@@ -65,8 +67,8 @@ def init_liste():
     re = []
     rea = []
     for line in f:
-        rd.append(line.rstrip().split(';')[0])
-        re.append(line.rstrip().split(';')[1])
+        rd.append(line.rstrip().split(';')[1])
+        re.append(line.rstrip().split(';')[2])
     f.close()
 
 
@@ -166,7 +168,12 @@ def savevoc(root, event=None):
     if e1.get() == "Darf nicht leer sein!" or e2.get() == "Darf nicht leer sein!":
         pass
     else:
-        print(e1.get() + ';' + e2.get(), file=vocs)
+        global lineinfile
+        print(str(lineinfile) + ";" + e1.get() + ';' + e2.get(), file=vocs)
+        lineinfile += 1
+        with open("CONFIG.config", "w") as file:
+            file.write("PATH=" + directory)
+            file.write("\nX=" + str(lineinfile))
         print(repr(vocs.getvalue().strip()))
         with open(directory + "\\vocs.txt", "w") as f:
             f.write(vocs.getvalue().strip())
@@ -204,11 +211,11 @@ def random_abfrage(root, event=None):
     global correct_answer
     correct_answer = tk.StringVar()
     abfragel6 = tk.Label(root, textvariable=correct_answer, background="white")
-    evoc = tk.Entry(root)
+    evoc = tk.Entry(root, bg="lightgrey")
     evoc.bind("<Return>",
               partial(compare_evoc, evoc, xd, root, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5,
                       abfragel6))
-    dvoc = tk.Entry(root)
+    dvoc = tk.Entry(root, bg="lightgrey")
     dvoc.bind("<Return>",
               partial(compare_dvoc, dvoc, xe, root, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5,
                       abfragel6))
@@ -305,8 +312,8 @@ def update():
     showvocs = open(directory + "\\vocs.txt")
     deutsch, englisch = [], []
     for line in showvocs:
-        deutsch.append(line.rstrip().split(';')[0])
-        englisch.append(line.rstrip().split(';')[1])
+        deutsch.append(line.rstrip().split(';')[1])
+        englisch.append(line.rstrip().split(';')[2])
     
 #     showenglish = open(directory + "\\English.txt")
     german.set("\n".join(deutsch))
@@ -353,8 +360,8 @@ def delete_entrys_window(root, event=None):
     vocs = open(directory + "\\vocs.txt")
     x=1
     for line in vocs:
-        tk.Label(delete, text=line.rstrip().split(";")[0], background="white").grid(row=x, column=0)
-        tk.Label(delete, text=line.rstrip().split(";")[1], background="white").grid(row=x, column=1)
+        tk.Label(delete, text=line.rstrip().split(";")[1], background="white").grid(row=x, column=0)
+        tk.Label(delete, text=line.rstrip().split(";")[2], background="white").grid(row=x, column=1)
         deletebutton = tk.Button(delete, text="Delete", command=partial(delete_entrys, x), background="red")
         deletebutton.bind("<Return>", partial(delete_entrys, x))
         deletebutton.grid(row=x, column=2, sticky="w", padx=5, pady=3)
@@ -367,7 +374,34 @@ def delete_entrys_window(root, event=None):
 
 
 def delete_entrys(x, event=None):
-    pass
+    file = open(directory + "\\vocs.txt")
+    text = ""
+    y = 1
+    for line in file:
+        if y == x:
+            break
+        text += str(line.rstrip().split())
+        y += 1
+    anotherfile = open(directory + "\\test.txt", "w")
+    split = ""
+    if x > 2:
+        z = 0
+        while True:
+            if z == x:
+                break
+            print(z)
+            print(text)
+            print(split)
+            split += str(text.split("']['")[z-1])
+            print(split)
+            print(text)
+            z += 1
+    print(split)
+    # text = split.strip("['").rstrip("']")
+    anotherfile.write(text)
+    print(text)
+
+
 
 
 def quit_window(root, event=None):
@@ -376,36 +410,48 @@ def quit_window(root, event=None):
 
 def path_is(event=None):
     global path
+    global directory
     path = tkf.askdirectory()
-    install.destroy()
+    if path is not "":
+        config = open("CONFIG.config", "w")
+        config.write("PATH=" + path)
+        config.write("\nX=0")
+        config.close()
+        config = open("CONFIG.config", "r")
+        x = 0
+        for line in config:
+            if x == 0:
+                directory = line.rstrip().split("=")[1]
+            if x == 1:
+                lineinfile = line.rstrip().split("=")[1]
+            x += 1
+        install.destroy()
 
 
 if __name__ == "__main__":
     try:
         path = open("CONFIG.config", "r")
-        directory = path.read().rstrip().split("=")[1]
+        x = 0
+        for line in path:
+            if x == 0:
+                directory = line.rstrip().split("=")[1]
+            if x == 1:
+                lineinfile = int(line.rstrip().split("=")[1])
+            x += 1
+        print(lineinfile)
+        # directory = path.read().rstrip().split("=")[1]
+        # lineinfile = path.read().rstrip().split("=")[0]
     except FileNotFoundError:
         install = tk.Tk()
-        install.title("Install VokTrainer")
-        tk.Label(text="Choose a Path").grid()
+        install.title("VokTrainer")
+        install.configure(background="white")
+        install.resizable(0,0)
+        tk.Label(text="Choose a Path", bg="white").grid()
         b = tk.Button(text="OK", command=path_is, background="white")
         b.bind("<Return>", path_is)
         b.grid()
         install.mainloop()
-        if path is not "":
-            config = open("CONFIG.config", "w")
-            config.write("PATH=" + path)
-            config.close()
-            config = open("CONFIG.config", "r")
-            directory = config.read().rstrip().split("=")[1]
+        if path == "":
+            quit()
     print(directory)
-    # try:
-    #     ask_window()
-    #     print(chosen)
-    #     if chosen is False:
-    #         pass
-    #     elif chosen is True:
-    #         app()
-    # except NameError:
-    #     pass
     app()
