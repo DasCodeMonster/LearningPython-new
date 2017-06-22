@@ -21,6 +21,7 @@ rd = []
 re = []
 rda = []
 rea = []
+path = ""
 
 def help():
     print("help")
@@ -28,7 +29,9 @@ def help():
 def ask_window():
     ask = tk.Tk()
     ask.title("VokTrainer")
-    b1 = tk.Button(ask, text="Choose directory", command=partial(askdir, ask))
+    ask.configure(background="white")
+    ask.resizable(0,0)
+    b1 = tk.Button(ask, text="Choose directory", command=partial(askdir, ask), background="white")
     b1.bind("<Return>", partial(askdir, ask))
     b1.pack(pady=5)
     ask.mainloop()
@@ -70,6 +73,8 @@ def init_liste():
 def app():
     root = tk.Tk()
     root.title("Vokabeltrainer")
+    root.resizable(0,0)
+    root.configure(background="white")
     global german
     global english
     german = tk.StringVar()
@@ -78,51 +83,55 @@ def app():
     root.config(menu=menu)
     helpmenu = tk.Menu(menu)
     windowmenu = tk.Menu(menu)
+    bearbeiten = tk.Menu(menu)
+    bearbeiten.add_command(label="Einträge bearbeiten", command=partial(delete_entrys_window, root))
     helpmenu.add_command(label="Help", command=help)
     windowmenu.add_command(label="Test 2", command=help)
     menu.add_cascade(label="Help", menu=helpmenu)
     menu.add_cascade(label="Test", menu=windowmenu)
+    menu.add_cascade(label="Bearbeiten", menu=bearbeiten)
     global directory
     global l1
-    l1 = tk.Label(root, text="Directory: " + directory)
+    l1 = tk.Label(root, text="Directory: " + directory, background="white")
     l1.grid(row=0, column=0, columnspan=2, sticky="w", padx=5, pady=3)
-    b0 = tk.Button(root, text="Browse", command=partial(change_directory, root))
+    b0 = tk.Button(root, text="Browse", command=partial(change_directory, root), background="white")
     b0.bind("<Return>", partial(change_directory, root))
     b0.grid(row=0, column=2, sticky="w", padx=5, pady=3)
-    tk.Label(root, text="Vokabeln einspeichern:").grid(row=1, column=0, sticky="w", padx=5, pady=3)
-    tk.Label(root, text="Deutsch:").grid(row=2, column=0, sticky="e", padx=5, pady=3)
+    tk.Label(root, text="Vokabeln einspeichern:", background="white").grid(row=1, column=0, sticky="w", padx=5, pady=3)
+    tk.Label(root, text="Deutsch:", background="white").grid(row=2, column=0, sticky="e", padx=5, pady=3)
     global e1
     global e2
-    e1 = tk.Entry(root)
-    e2 = tk.Entry(root)
+    e1 = tk.Entry(root, background="lightgrey")
+    e2 = tk.Entry(root, background="lightgrey")
     e1.bind("<Return>", partial(next_box, e2))
     e1.grid(row=2, column=1, sticky="w", padx=5, pady=3)
     e1.focus_force()
-    tk.Label(root, text="English:").grid(row=3, column=0, sticky="e", padx=5, pady=3)
+    tk.Label(root, text="English:", background="white").grid(row=3, column=0, sticky="e", padx=5, pady=3)
     e2.bind("<Return>", partial(savevoc, root))
     e2.grid(row=3, column=1, sticky="w", padx=5, pady=3)
-    b1 = tk.Button(root, text="Save Voc.", command=partial(savevoc, root))
+    b1 = tk.Button(root, text="Save Voc.", command=partial(savevoc, root), background="white")
     b1.bind("<Return>", partial(savevoc, root))
     b1.grid(row=4, column=1, sticky="e", padx=5, pady=3)
     global b2
-    b2 = tk.Button(root, text="Show all", command=partial(show_all, root))
+    b2 = tk.Button(root, text="Show all", command=partial(show_all, root), background="white")
     b2.bind("<Return>", partial(show_all, root))
     b2.grid(row=4, column=1, sticky="w", padx=5, pady=3)
     global b3
-    b3 = tk.Button(root, text="Abfrage", command=partial(random_abfrage, root))
+    b3 = tk.Button(root, text="Abfrage", command=partial(random_abfrage, root), background="white")
     b3.bind("<Return>", partial(random_abfrage, root))
     b3.grid(row=4, column=0, sticky="e", padx=5, pady=3)
-    b4 = tk.Button(root, text="Quit", command=partial(quit_window, root))
+    b4 = tk.Button(root, text="Quit", command=partial(quit_window, root), background="white")
     b4.bind("<Return>", partial(quit_window, root))
     b4.grid(row=4, column=0, sticky="w", padx=5, pady=3)
-    b5 = tk.Button(root, text="Delete Entrys", command=partial(delete_entrys_window, root))
+    b5 = tk.Button(root, text="Delete Entrys", command=partial(delete_entrys_window, root), background="white")
     b5.bind("<Return>", partial(delete_entrys_window, root))
-    b5.grid(row=4, column=2, sticky="w", padx=5, pady=3)
+    # b5.grid(row=4, column=2, sticky="w", padx=5, pady=3)
     root.mainloop()
 
 
 def next_box(e2, event=None):
     e2.focus()
+
 
 def change_directory(root, event=None):
     global l1
@@ -131,13 +140,12 @@ def change_directory(root, event=None):
     tempdirectory = tkf.askdirectory()
     if tempdirectory != "":
         directory = tempdirectory
+        open("CONFIG.config", "w").write("PATH=" + directory)
     print(directory)
     print(tempdirectory)
-    l1 = tk.Label(root, text="Directory: " + directory)
+    l1 = tk.Label(root, text="Directory: " + directory, background="white")
     l1.grid(row=0, column=0, columnspan=2, sticky="w", padx=5, pady=3)
     init_liste()
-
-    # root.update()
 
 
 def savevoc(root, event=None):
@@ -147,33 +155,13 @@ def savevoc(root, event=None):
             vocs.write(f.read() + '\n')
     except FileNotFoundError:
         pass
-#     while True:
-#         try:
-#             efile = open(directory + "\\Deutsch.txt", "a")
-#             break
-#         except Exception:
-#             open(directory + "\\Deutsch.txt", "w")
-#             continue
-#     while True:
-#         try:
-#             dfile = open(directory + "\\English.txt", "a")
-#             break
-#         except Exception:
-#             open(directory + "\\English.txt", "w")
-#             continue
     global e1
     global e2
     if e1.get() == "":
         print("Darf nicht leer sein!")
-        # e1.destroy()
-        # e1 = tk.Entry(root)
         e1.insert(0, "Darf nicht leer sein!")
-#         e1.grid(row=2, column=1, sticky="w", padx=5, pady=3)
     if e2.get() == "":
-        # e2.destroy()
-        # e2 = tk.Entry(root)
         e2.insert(0, "Darf nicht leer sein!")
-#         e2.grid(row=3, column=1, sticky="w", padx=5, pady=3)
         print("Darf nicht leer sein")
     if e1.get() == "Darf nicht leer sein!" or e2.get() == "Darf nicht leer sein!":
         pass
@@ -182,16 +170,10 @@ def savevoc(root, event=None):
         print(repr(vocs.getvalue().strip()))
         with open(directory + "\\vocs.txt", "w") as f:
             f.write(vocs.getvalue().strip())
-#         with open("Test.txt", 'w') as f:
-#             f.write(vocs.getvalue().rstrip())
-#         efile.write(e1.get() + "\n")
         print("Saved german Voc")
-#         dfile.write(e2.get() + "\n")
         print("Saved english Voc")
         e1.delete(0, "end")
         e2.delete(0, "end")
-#     efile.close()
-#     dfile.close()
     init_liste()
     e1.focus()
     update()
@@ -199,11 +181,12 @@ def savevoc(root, event=None):
 
 
 def random_abfrage(root, event=None):
-    abfragel1 = tk.Label(root, text="Abfrage")
+    init_liste()
+    abfragel1 = tk.Label(root, text="Abfrage", background="white")
     abfragel1.grid(row=7, column=0, sticky="w", padx=5, pady=3)
-    abfragel2 = tk.Label(root, text="Deutsch:")
+    abfragel2 = tk.Label(root, text="Deutsch:", background="white")
     abfragel2.grid(row=8, column=0, sticky="w", padx=5, pady=3)
-    abfragel3 = tk.Label(root, text="English:")
+    abfragel3 = tk.Label(root, text="English:", background="white")
     abfragel3.grid(row=8, column=1, sticky="w", padx=5, pady=3)
     root.update()
     x = random.randint(1, 2)
@@ -216,11 +199,11 @@ def random_abfrage(root, event=None):
     english = tk.StringVar()
     xe = random.randint(0, len(re) - 1)
     english.set(re[xe])
-    abfragel4 = tk.Label(root, textvariable=vocs)
-    abfragel5 = tk.Label(root, textvariable=english)
+    abfragel4 = tk.Label(root, textvariable=vocs, background="white")
+    abfragel5 = tk.Label(root, textvariable=english, background="white")
     global correct_answer
     correct_answer = tk.StringVar()
-    abfragel6 = tk.Label(root, textvariable=correct_answer)
+    abfragel6 = tk.Label(root, textvariable=correct_answer, background="white")
     evoc = tk.Entry(root)
     evoc.bind("<Return>",
               partial(compare_evoc, evoc, xd, root, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5,
@@ -233,7 +216,7 @@ def random_abfrage(root, event=None):
     b3.destroy()
     b3 = tk.Button(root, text="Hide: Abfrage", relief="raised",
                    command=partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc,
-                                   root))
+                                   root), background="white")
     b3.bind("<Return>", partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc, root))
     b3.grid(row=4, column=0, sticky="e", padx=5, pady=3)
     if x == 1:
@@ -314,7 +297,7 @@ def hide_abfrage(label1, label2, label3, label4, label5, entry1, entry2, root, e
     entry2.destroy()
     global b3
     b3.destroy()
-    b3 = tk.Button(root, text="Abfrage", command=partial(random_abfrage, root))
+    b3 = tk.Button(root, text="Abfrage", command=partial(random_abfrage, root), background="white")
     b3.bind("<Return>", partial(random_abfrage, root))
     b3.grid(row=4, column=0, sticky="e", padx=5, pady=3)
 
@@ -333,17 +316,17 @@ def show_all(root, event=None):
     global german
     global english
     update()
-    showl1 = tk.Label(root, text="Deutsch:")
+    showl1 = tk.Label(root, text="Deutsch:", background="white")
     showl1.grid(row=5, column=0, sticky="w", padx=5, pady=3)
-    showl2 = tk.Label(root, textvariable=german)
+    showl2 = tk.Label(root, textvariable=german, background="white")
     showl2.grid(row=6, column=0, sticky="w", padx=5, pady=3)
-    showl3 = tk.Label(root, text="English")
+    showl3 = tk.Label(root, text="English", background="white")
     showl3.grid(row=5, column=1, sticky="w", padx=5, pady=3)
-    showl4 = tk.Label(root, textvariable=english)
+    showl4 = tk.Label(root, textvariable=english, background="white")
     showl4.grid(row=6, column=1, sticky="w", padx=5, pady=3)
     global b2
     b2.destroy()
-    b2 = tk.Button(root, text="Hide", command=partial(show_nothing, showl1, showl2, showl3, showl4, root))
+    b2 = tk.Button(root, text="Hide", command=partial(show_nothing, showl1, showl2, showl3, showl4, root), background="white")
     b2.bind("<Return>", partial(show_nothing, showl1, showl2, showl3, showl4, root))
     b2.grid(row=4, column=1, sticky="w", padx=5, pady=3)
 
@@ -354,7 +337,7 @@ def show_nothing(label1, label2, label3, label4, root, event=None):
     label3.destroy()
     label4.destroy()
     global b2
-    b2 = tk.Button(root, text="Show all", command=partial(show_all, root))
+    b2 = tk.Button(root, text="Show all", command=partial(show_all, root), background="white")
     b2.bind("<Return>", partial(show_all, root))
     b2.grid(row=4, column=1, sticky="w", padx=5, pady=3)
 
@@ -362,25 +345,20 @@ def show_nothing(label1, label2, label3, label4, root, event=None):
 def delete_entrys_window(root, event=None):
     delete = tk.Toplevel()
     delete.title("Delete Vocs")
+    delete.resizable(0,0)
+    delete.configure(background="white")
     delete.focus_force()
-    tk.Label(delete, text="Deutsch:").grid(row=0, column=0, sticky="w", padx=5, pady=3)
-    tk.Label(delete, text="English:").grid(row=0, column=1, sticky="e", padx=5, pady=3)
-    efile = open(directory + "/English.txt", "r+")
-    dfile = open(directory + "/Deutsch.txt", "r+")
-    x = 1
-    for line in efile:
-        tk.Label(delete, text=line.rstrip()).grid(row=x, column=1)
-        delete.update()
-        bn = tk.Button(delete, text="Delete", command=partial(delete_entrys, x))
-        bn.bind("<Return>", partial(delete_entrys, x))
-        bn.grid(row=x, column=2, sticky="w", padx=5, pady=3)
+    tk.Label(delete, text="Deutsch:", background="white").grid(row=0, column=0, sticky="w", padx=5, pady=3)
+    tk.Label(delete, text="English:", background="white").grid(row=0, column=1, sticky="e", padx=5, pady=3)
+    vocs = open(directory + "\\vocs.txt")
+    x=1
+    for line in vocs:
+        tk.Label(delete, text=line.rstrip().split(";")[0], background="white").grid(row=x, column=0)
+        tk.Label(delete, text=line.rstrip().split(";")[1], background="white").grid(row=x, column=1)
+        deletebutton = tk.Button(delete, text="Delete", command=partial(delete_entrys, x), background="red")
+        deletebutton.bind("<Return>", partial(delete_entrys, x))
+        deletebutton.grid(row=x, column=2, sticky="w", padx=5, pady=3)
         x += 1
-    x = 1
-    for line in dfile:
-        tk.Label(delete, text=line.rstrip()).grid(row=x, column=0)
-        x += 1
-    efile.close()
-    dfile.close()
     root.update()
     delete.update()
     delete.mainloop()
@@ -389,23 +367,45 @@ def delete_entrys_window(root, event=None):
 
 
 def delete_entrys(x, event=None):
-    efile = open(directory + "\\English.txt", "w+")
-    dfile = open(directory + "\\Deutsch.txt", "w+")
-    print(efile.read())
-    print(dfile.read())
+    pass
 
 
 def quit_window(root, event=None):
     root.quit()
 
 
+def path_is(event=None):
+    global path
+    path = tkf.askdirectory()
+    install.destroy()
+
+
 if __name__ == "__main__":
     try:
-        ask_window()
-        print(chosen)
-        if chosen is False:
-            pass
-        elif chosen is True:
-            app()
-    except NameError:
-        pass
+        path = open("CONFIG.config", "r")
+        directory = path.read().rstrip().split("=")[1]
+    except FileNotFoundError:
+        install = tk.Tk()
+        install.title("Install VokTrainer")
+        tk.Label(text="Choose a Path").grid()
+        b = tk.Button(text="OK", command=path_is, background="white")
+        b.bind("<Return>", path_is)
+        b.grid()
+        install.mainloop()
+        if path is not "":
+            config = open("CONFIG.config", "w")
+            config.write("PATH=" + path)
+            config.close()
+            config = open("CONFIG.config", "r")
+            directory = config.read().rstrip().split("=")[1]
+    print(directory)
+    # try:
+    #     ask_window()
+    #     print(chosen)
+    #     if chosen is False:
+    #         pass
+    #     elif chosen is True:
+    #         app()
+    # except NameError:
+    #     pass
+    app()
