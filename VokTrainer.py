@@ -25,6 +25,7 @@ rea = []
 path = ""
 lineinfile = 0
 
+
 def help():
     print("help")
 
@@ -76,7 +77,7 @@ def init_liste():
 def app():
     root = tk.Tk()
     root.title("Vokabeltrainer")
-    root.resizable(0,0)
+    root.resizable(0, 0)
     root.configure(background="white")
     global german
     global english
@@ -226,7 +227,8 @@ def random_abfrage(root, event=None):
         b3 = tk.Button(root, text="Hide: Abfrage", relief="raised",
                        command=partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc,
                                        root), background="white")
-        b3.bind("<Return>", partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc, root))
+        b3.bind("<Return>",
+                partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc, root))
         b3.grid(row=4, column=0, sticky="e", padx=5, pady=3)
         if x == 1:
             abfragel4.grid(row=9, column=0, sticky="w", padx=5, pady=3)
@@ -243,7 +245,8 @@ def random_abfrage(root, event=None):
         time.sleep(1)
         novocs.destroy()
 
-def compare_evoc(evoc, xd, root, label1, label2, label3, label4, label5, label6,  event=None):
+
+def compare_evoc(evoc, xd, root, label1, label2, label3, label4, label5, label6, event=None):
     global correct_answer
     global re
     # global rea
@@ -315,17 +318,19 @@ def hide_abfrage(label1, label2, label3, label4, label5, entry1, entry2, root, e
     b3.bind("<Return>", partial(random_abfrage, root))
     b3.grid(row=4, column=0, sticky="e", padx=5, pady=3)
 
+
 def update():
     showvocs = open(directory + "\\vocs.txt")
     deutsch, englisch = [], []
     for line in showvocs:
         deutsch.append(line.rstrip().split(';')[1])
         englisch.append(line.rstrip().split(';')[2])
-    
-#     showenglish = open(directory + "\\English.txt")
+
+    #     showenglish = open(directory + "\\English.txt")
     german.set("\n".join(deutsch))
     english.set("\n".join(englisch))
-    
+
+
 def show_all(root, event=None):
     global german
     global english
@@ -360,7 +365,7 @@ def show_nothing(label1, label2, label3, label4, root, event=None):
 def delete_entrys_window(root, event=None):
     delete = tk.Toplevel()
     delete.title("Delete Vocs")
-    delete.resizable(0,0)
+    delete.resizable(0, 0)
     delete.configure(background="white")
     delete.focus_force()
     group_labels(root, delete)
@@ -380,7 +385,8 @@ def group_labels(root, delete):
     for line in vocs:
         tk.Label(group, text=line.rstrip().split(";")[1], background="white").grid(row=x, column=0)
         tk.Label(group, text=line.rstrip().split(";")[2], background="white").grid(row=x, column=1)
-        deletebutton = tk.Button(group, text="Delete", command=partial(delete_entrys, x, root, group, delete), background="red")
+        deletebutton = tk.Button(group, text="Delete", command=partial(delete_entrys, x, root, group, delete),
+                                 background="red")
         deletebutton.bind("<Return>", partial(delete_entrys, x, root, group, delete))
         deletebutton.grid(row=x, column=2, sticky="w", padx=5, pady=3)
         x += 1
@@ -395,7 +401,7 @@ def delete_entrys(x, root, group, delete, event=None):
     for line in file:
         if y == x:
             break
-        text += str(line) #  .rstrip()) #  .split())
+        text += str(line)  # .rstrip()) #  .split())
         y += 1
     anotherfile = open(directory + "\\test.txt", "w")
     text2 = ""
@@ -434,6 +440,7 @@ def delete_entrys(x, root, group, delete, event=None):
     root.update()
     group.destroy()
     group_labels(root, delete)
+    init_liste()
     # group.update()
 
 
@@ -477,7 +484,7 @@ if __name__ == "__main__":
         install = tk.Tk()
         install.title("VokTrainer")
         install.configure(background="white")
-        install.resizable(0,0)
+        install.resizable(0, 0)
         tk.Label(text="Choose a Path", bg="white").grid()
         b = tk.Button(text="OK", command=path_is, background="white")
         b.bind("<Return>", path_is)
