@@ -411,6 +411,7 @@ def delete_entrys(x, root, delete_window, event=None):
     os.remove(directory + "\\test.txt")
     os.remove(directory + "\\test2.txt")
     newvocsfile = open(directory + "\\vocs.txt")
+    newlines = ""
     for line in newvocsfile:
         newlines = line.split(";")[0]
     newvocsfile.close()
