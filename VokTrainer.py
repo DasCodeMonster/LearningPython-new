@@ -190,52 +190,58 @@ def savevoc(root, event=None):
 
 def random_abfrage(root, event=None):
     init_liste()
-    abfragel1 = tk.Label(root, text="Abfrage", background="white")
-    abfragel1.grid(row=7, column=0, sticky="w", padx=5, pady=3)
-    abfragel2 = tk.Label(root, text="Deutsch:", background="white")
-    abfragel2.grid(row=8, column=0, sticky="w", padx=5, pady=3)
-    abfragel3 = tk.Label(root, text="English:", background="white")
-    abfragel3.grid(row=8, column=1, sticky="w", padx=5, pady=3)
-    root.update()
-    x = random.randint(1, 2)
-    print(x)
     global rd
-    vocs = tk.StringVar()
-    xd = random.randint(0, len(rd) - 1)
-    vocs.set(rd[xd])
-    global re
-    english = tk.StringVar()
-    xe = random.randint(0, len(re) - 1)
-    english.set(re[xe])
-    abfragel4 = tk.Label(root, textvariable=vocs, background="white")
-    abfragel5 = tk.Label(root, textvariable=english, background="white")
-    global correct_answer
-    correct_answer = tk.StringVar()
-    abfragel6 = tk.Label(root, textvariable=correct_answer, background="white")
-    evoc = tk.Entry(root, bg="lightgrey")
-    evoc.bind("<Return>",
-              partial(compare_evoc, evoc, xd, root, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5,
-                      abfragel6))
-    dvoc = tk.Entry(root, bg="lightgrey")
-    dvoc.bind("<Return>",
-              partial(compare_dvoc, dvoc, xe, root, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5,
-                      abfragel6))
-    global b3
-    b3.destroy()
-    b3 = tk.Button(root, text="Hide: Abfrage", relief="raised",
-                   command=partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc,
-                                   root), background="white")
-    b3.bind("<Return>", partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc, root))
-    b3.grid(row=4, column=0, sticky="e", padx=5, pady=3)
-    if x == 1:
-        abfragel4.grid(row=9, column=0, sticky="w", padx=5, pady=3)
-        evoc.grid(row=9, column=1, sticky="w", padx=5, pady=3)
-        evoc.focus()
-    elif x == 2:
-        abfragel5.grid(row=9, column=1, sticky="w", padx=5, pady=3)
-        dvoc.grid(row=9, column=0, sticky="w", padx=5, pady=3)
-        dvoc.focus()
-
+    if len(rd) is not 0:
+        abfragel1 = tk.Label(root, text="Abfrage", background="white")
+        abfragel1.grid(row=7, column=0, sticky="w", padx=5, pady=3)
+        abfragel2 = tk.Label(root, text="Deutsch:", background="white")
+        abfragel2.grid(row=8, column=0, sticky="w", padx=5, pady=3)
+        abfragel3 = tk.Label(root, text="English:", background="white")
+        abfragel3.grid(row=8, column=1, sticky="w", padx=5, pady=3)
+        root.update()
+        x = random.randint(1, 2)
+        print(x)
+        vocs = tk.StringVar()
+        xd = random.randint(0, len(rd) - 1)
+        vocs.set(rd[xd])
+        global re
+        english = tk.StringVar()
+        xe = random.randint(0, len(re) - 1)
+        english.set(re[xe])
+        abfragel4 = tk.Label(root, textvariable=vocs, background="white")
+        abfragel5 = tk.Label(root, textvariable=english, background="white")
+        global correct_answer
+        correct_answer = tk.StringVar()
+        abfragel6 = tk.Label(root, textvariable=correct_answer, background="white")
+        evoc = tk.Entry(root, bg="lightgrey")
+        evoc.bind("<Return>",
+                  partial(compare_evoc, evoc, xd, root, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5,
+                          abfragel6))
+        dvoc = tk.Entry(root, bg="lightgrey")
+        dvoc.bind("<Return>",
+                  partial(compare_dvoc, dvoc, xe, root, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5,
+                          abfragel6))
+        global b3
+        b3.destroy()
+        b3 = tk.Button(root, text="Hide: Abfrage", relief="raised",
+                       command=partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc,
+                                       root), background="white")
+        b3.bind("<Return>", partial(hide_abfrage, abfragel1, abfragel2, abfragel3, abfragel4, abfragel5, evoc, dvoc, root))
+        b3.grid(row=4, column=0, sticky="e", padx=5, pady=3)
+        if x == 1:
+            abfragel4.grid(row=9, column=0, sticky="w", padx=5, pady=3)
+            evoc.grid(row=9, column=1, sticky="w", padx=5, pady=3)
+            evoc.focus()
+        elif x == 2:
+            abfragel5.grid(row=9, column=1, sticky="w", padx=5, pady=3)
+            dvoc.grid(row=9, column=0, sticky="w", padx=5, pady=3)
+            dvoc.focus()
+    else:
+        novocs = tk.Label(root, text="You have no vocs!", bg="white")
+        novocs.grid(row=7, column=0, sticky="w", padx=5, pady=3)
+        root.update()
+        time.sleep(1)
+        novocs.destroy()
 
 def compare_evoc(evoc, xd, root, label1, label2, label3, label4, label5, label6,  event=None):
     global correct_answer
@@ -357,17 +363,7 @@ def delete_entrys_window(root, event=None):
     delete.resizable(0,0)
     delete.configure(background="white")
     delete.focus_force()
-    tk.Label(delete, text="Deutsch:", background="white").grid(row=0, column=0, sticky="w", padx=5, pady=3)
-    tk.Label(delete, text="English:", background="white").grid(row=0, column=1, sticky="e", padx=5, pady=3)
-    vocs = open(directory + "\\vocs.txt")
-    x=1
-    for line in vocs:
-        tk.Label(delete, text=line.rstrip().split(";")[1], background="white").grid(row=x, column=0)
-        tk.Label(delete, text=line.rstrip().split(";")[2], background="white").grid(row=x, column=1)
-        deletebutton = tk.Button(delete, text="Delete", command=partial(delete_entrys, x, root, delete), background="red")
-        deletebutton.bind("<Return>", partial(delete_entrys, x, root, delete))
-        deletebutton.grid(row=x, column=2, sticky="w", padx=5, pady=3)
-        x += 1
+    group_labels(root, delete)
     root.update()
     delete.update()
     delete.mainloop()
@@ -375,7 +371,24 @@ def delete_entrys_window(root, event=None):
     e1.focus()
 
 
-def delete_entrys(x, root, delete_window, event=None):
+def group_labels(root, delete):
+    group = tk.LabelFrame(delete, padx=5, pady=3)
+    tk.Label(group, text="Deutsch:", background="white").grid(row=0, column=0, sticky="w", padx=5, pady=3)
+    tk.Label(group, text="English:", background="white").grid(row=0, column=1, sticky="e", padx=5, pady=3)
+    vocs = open(directory + "\\vocs.txt")
+    x = 1
+    for line in vocs:
+        tk.Label(group, text=line.rstrip().split(";")[1], background="white").grid(row=x, column=0)
+        tk.Label(group, text=line.rstrip().split(";")[2], background="white").grid(row=x, column=1)
+        deletebutton = tk.Button(group, text="Delete", command=partial(delete_entrys, x, root, group, delete), background="red")
+        deletebutton.bind("<Return>", partial(delete_entrys, x, root, group, delete))
+        deletebutton.grid(row=x, column=2, sticky="w", padx=5, pady=3)
+        x += 1
+    group.configure(bg="white")
+    group.grid()
+
+
+def delete_entrys(x, root, group, delete, event=None):
     file = open(directory + "\\vocs.txt")
     text = ""
     y = 1
@@ -419,11 +432,13 @@ def delete_entrys(x, root, delete_window, event=None):
     config.write("PATH=" + directory + "\n" + "X=" + str(newlines).strip("['").rstrip("']"))
     config.close()
     root.update()
-    delete_window.update()
-
+    group.destroy()
+    group_labels(root, delete)
+    # group.update()
 
 
 def quit_window(root, event=None):
+    root.destroy()
     root.quit()
 
 
@@ -458,8 +473,6 @@ if __name__ == "__main__":
                 lineinfile = int(line.rstrip().split("=")[1])
             x += 1
         print(lineinfile)
-        # directory = path.read().rstrip().split("=")[1]
-        # lineinfile = path.read().rstrip().split("=")[0]
     except FileNotFoundError:
         install = tk.Tk()
         install.title("VokTrainer")
