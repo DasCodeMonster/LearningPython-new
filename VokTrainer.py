@@ -5,6 +5,7 @@ from functools import partial
 import time
 import random
 import io
+import os
 
 directory = None
 chosen = None
@@ -169,7 +170,7 @@ def savevoc(root, event=None):
         pass
     else:
         global lineinfile
-        print(str(lineinfile) + ";" + e1.get() + ';' + e2.get(), file=vocs)
+        print(str(lineinfile + 1) + ";" + e1.get() + ';' + e2.get(), file=vocs)
         lineinfile += 1
         with open("CONFIG.config", "w") as file:
             file.write("PATH=" + directory)
@@ -333,7 +334,8 @@ def show_all(root, event=None):
     showl4.grid(row=6, column=1, sticky="w", padx=5, pady=3)
     global b2
     b2.destroy()
-    b2 = tk.Button(root, text="Hide", command=partial(show_nothing, showl1, showl2, showl3, showl4, root), background="white")
+    b2 = tk.Button(root, text="Hide", command=partial(show_nothing, showl1, showl2, showl3, showl4, root),
+                   background="white")
     b2.bind("<Return>", partial(show_nothing, showl1, showl2, showl3, showl4, root))
     b2.grid(row=4, column=1, sticky="w", padx=5, pady=3)
 
@@ -362,8 +364,8 @@ def delete_entrys_window(root, event=None):
     for line in vocs:
         tk.Label(delete, text=line.rstrip().split(";")[1], background="white").grid(row=x, column=0)
         tk.Label(delete, text=line.rstrip().split(";")[2], background="white").grid(row=x, column=1)
-        deletebutton = tk.Button(delete, text="Delete", command=partial(delete_entrys, x), background="red")
-        deletebutton.bind("<Return>", partial(delete_entrys, x))
+        deletebutton = tk.Button(delete, text="Delete", command=partial(delete_entrys, x, root, delete), background="red")
+        deletebutton.bind("<Return>", partial(delete_entrys, x, root, delete))
         deletebutton.grid(row=x, column=2, sticky="w", padx=5, pady=3)
         x += 1
     root.update()
@@ -373,34 +375,50 @@ def delete_entrys_window(root, event=None):
     e1.focus()
 
 
-def delete_entrys(x, event=None):
+def delete_entrys(x, root, delete_window, event=None):
     file = open(directory + "\\vocs.txt")
     text = ""
     y = 1
     for line in file:
         if y == x:
             break
-        text += str(line.rstrip().split())
+        text += str(line) #  .rstrip()) #  .split())
         y += 1
     anotherfile = open(directory + "\\test.txt", "w")
-    split = ""
-    if x > 2:
-        z = 0
-        while True:
-            if z == x:
-                break
-            print(z)
-            print(text)
-            print(split)
-            split += str(text.split("']['")[z-1])
-            print(split)
-            print(text)
-            z += 1
-    print(split)
-    # text = split.strip("['").rstrip("']")
-    anotherfile.write(text)
+    text2 = ""
+    for line in file:
+        if y >= x:
+            text2 += str(line)
+        y += 1
+    anotherfile.write(text + text2)
     print(text)
-
+    anotherfile.close()
+    anotherfile = open(directory + "\\test.txt", "r")
+    fileline = 0
+    thefile = open(directory + "\\test2.txt", "w")
+    for line in anotherfile:
+        if line.split(";")[0] is not fileline:
+            thefile.write(str(fileline) + ";" + str(line.split(";")[1]) + ";" + str(line.split(";")[2]))
+            print(str(fileline) + ";" + str(line.split(";")[1]) + str(line.split(";")[2]))
+        fileline += 1
+    thefile.close()
+    anotherfile.close()
+    thefile = open(directory + "\\test2.txt", "r")
+    newvocsfile = open(directory + "\\vocs.txt", "w")
+    newvocsfile.write(thefile.read())
+    newvocsfile.close()
+    thefile.close()
+    os.remove(directory + "\\test.txt")
+    os.remove(directory + "\\test2.txt")
+    newvocsfile = open(directory + "\\vocs.txt")
+    for line in newvocsfile:
+        newlines = line.split(";")[0]
+    newvocsfile.close()
+    config = open("CONFIG.config", "w")
+    config.write("PATH=" + directory + "\n" + "X=" + str(newlines).strip("['").rstrip("']"))
+    config.close()
+    root.update()
+    delete_window.update()
 
 
 
