@@ -1,6 +1,6 @@
 #Ich fange nochmal an mit Python ;)
-import Module1
-x=1
+# import Module1
+# x=1
 # while x<=13:
 	# print("x ist kleiner als 13")
 	# x=x+1
