@@ -2,7 +2,6 @@ from Crypto.Cipher import AES
 import base64
 import random
 import string
-import sys
 
 
 BLOCK_SIZE = 32

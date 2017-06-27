@@ -2,14 +2,13 @@ from Crypto.Cipher import AES
 import base64
 import random
 import string
-import sys
 
 
 BLOCK_SIZE = 32
 PADDING = "{"
 
-pad =   lambda s: str(s) + (BLOCK_SIZE - len(str(s)) % BLOCK_SIZE ) * PADDING
-enc = lambda  c, m: base64.b64encode(c.encrypt(pad(m)))
+pad = lambda s: str(s) + (BLOCK_SIZE - len(str(s)) % BLOCK_SIZE ) * PADDING
+enc = lambda c, m: base64.b64encode(c.encrypt(pad(m)))
 dec = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 
 
@@ -27,12 +26,13 @@ def randomAscii():
 
 
 key = randomkey(32)
-iv = randomkey(16) #Initialisierungsvektor
+iv = randomkey(16)  # Initialisierungsvektor
 
 cipher = AES.new(key, AES.MODE_CBC, iv)
 
-input = open("C:\\Users\\Philip\\Desktop\\Git Python\\VokTrainer.py").readlines()
-output = open("VokTrainer_encrypted.py", "w")
+input = open("C:\\Users\\Philip\\Desktop\\Python_Git\\Neuanfang.py").readlines()
+# output = open("VokTrainer_encrypted.py", "w")
+output = open("C:\\Users\\Philip\\Desktop\\Python_Git\\Neuanfang_encrypted.py", "w")
 
 imports = list()
 lines = list()
