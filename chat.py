@@ -1,7 +1,6 @@
 import socket
 import threading
 
-
 Version = "0.0.1"
 ProjectName = "MyChat"
 connection = False
