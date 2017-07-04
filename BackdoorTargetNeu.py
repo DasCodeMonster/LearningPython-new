@@ -20,4 +20,4 @@ while True:
         s.send("<Leer>".encode(encoding='cp850'))
     else:
         s.send(out)
-#     s.send(process.stderr.read())
+        # s.send(process.stderr.read())

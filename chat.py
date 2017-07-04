@@ -1,7 +1,7 @@
 import socket
 import threading
 import sys
-import select
+# import select
 
 Version = "0.0.2"
 ProjectName = "MyChat"
@@ -12,7 +12,8 @@ sock2 = False
 exitVar = False
 owner = False
 joined = False
-commands = ["help", "create_room", "leave_room", "join_room", "exit"]
+commands = ["help", "create_room", "leave_room", "join_room", "exit", "join_room_test"]
+
 
 class Thread(threading.Thread):
     def __init__(self, _id, task, host, port):
@@ -39,14 +40,17 @@ class Thread(threading.Thread):
             if exitVar is True:
                 break
             else:
-                ready = select.select([sock1], [], [])
-                print(ready[0])
-                if ready[0]:
-                    msg = connection.recv(1024)
-                    print(msg.decode("utf-8"))
+                # print("in running thread", self.id)
+                # ready = select.select([sock1], [], [])
+                # print("meh")
+                # print(ready[0])
+                # if ready[0]:
+                #     msg = connection.recv(1024)
+                #     print(msg.decode("utf-8"))
+                msg = connection.recv(1024)
+                print(msg.decode("utf-8"))
 
-
-    def joinRoom(self):
+    def joinRoom_alt(self):
         global sock2
         sock2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # sock2.setblocking(0)
@@ -64,6 +68,28 @@ class Thread(threading.Thread):
                 msgIn = sock2.recv(1024)
                 print(msgIn.decode("utf-8"))
 
+
+    def joinRoom(self):
+        global sock2
+        sock2 = socket.create_connection((self.host, self.port))
+        try:
+            try:
+                while True:
+                    msg = sock2.recv(1024)
+                    if msg.decode("utf-8").startswith("/closeSocket"):
+                        sock2.close()
+                        break
+                    else:
+                        print(msg.decode("utf-8"))
+            except ConnectionResetError(BaseException):
+                sock2.close()
+                global joined
+                joined = False
+        except TypeError:
+            sock2.close()
+            # global joined
+            joined = False
+            print("thread finished")
 
 def help():
     print("Commands:\n/help\n/create_room\n/leave_room\n/join_room\n/exit")
@@ -100,10 +126,14 @@ def create_room():
                 command = msgout.strip("/")
                 if command in commands:
                     exec(command + "()")
+                else:
+                    print("Not a command!")
             else:
                 if connection is not False:
                     connection.send(msgout.encode("utf-8"))
         else:
+            connection.send("/closeSocket")
+            connection.close()
             break
 
 
@@ -119,20 +149,38 @@ def join_room():
     global joined
     joined = True
     while True:
-        if exitVar is False:
+        if exitVar is not True or joined is not False:
             # msgout = input("Send: ")
             msgout = input()
             if msgout.startswith("/"):
                 command = msgout.strip("/")
                 if command in commands:
                     exec(command + "()")
+                else:
+                    print("Not a command!")
+                    print(help())
             else:
                 # print(sock2)
                 if sock2 is not False:
-                    print("send!")
-                    sock2.send(msgout.encode("utf-8"))
+                    # print("send!")
+                    try:
+                        sock2.send(msgout.encode("utf-8"))
+                    except OSError:
+                        break
         else:
+            sock2.close()
+            print("finished")
             break
+    sock2.close()
+    print("end of join_room")
+
+def join_room_test():
+    host = "127.0.0.1"
+    port = 1337
+    testSock = socket.create_connection((host, port))
+    while True:
+        msg = testSock.recv(1024)
+        print(msg.decode("utf-8"))
 
 
 def leave_room():
@@ -140,7 +188,7 @@ def leave_room():
 
 
 if __name__ == "__main__":
-    print("Hello welcome to %s!\n Version: %s" %(ProjectName, Version))
+    print("Hello welcome to %s!\n Version: %s" % (ProjectName, Version))
     print("For help type /help.")
     while True:
         InRoom = False
@@ -150,4 +198,4 @@ if __name__ == "__main__":
             if data in commands:
                 exec(data + "()")
             else:
-                print("There is no command named ", data)
+                print("There is no command named", data)
