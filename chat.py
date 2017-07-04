@@ -28,12 +28,12 @@ class Thread(threading.Thread):
     def create(self):
         sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock1.setblocking(0)
+        # sock1.setblocking(0)
         sock1.bind((self.host, self.port))
         sock1.listen(1)
         global connection
         connection, addr = sock1.accept()
-        print(type(connection))
+        # print(type(connection))
         global exitVar
         while True:
             if exitVar is True:
@@ -45,22 +45,24 @@ class Thread(threading.Thread):
                     msg = connection.recv(1024)
                     print(msg.decode("utf-8"))
 
+
     def joinRoom(self):
         global sock2
         sock2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock2.setblocking(0)
+        # sock2.setblocking(0)
         sock2.connect((self.host, self.port))
-        sock2.send(self.host.encode("utf-8") + " joined your room".encode("utf-8"))
+        # sock2.send(self.host.encode("utf-8") + " joined your room".encode("utf-8"))
         global exitVar
         while True:
             if exitVar is True:
                 break
             else:
-                ready = select.select([sock2], [], [])
-                if ready[0]:
-                    msgIn = sock2.recv(1024)
-                    print(msgIn.decode("utf-8"))
-
+                # ready = select.select([sock2], [], [])
+                # if ready[0]:
+                #     msgIn = sock2.recv(1024)
+                #     print(msgIn.decode("utf-8"))
+                msgIn = sock2.recv(1024)
+                print(msgIn.decode("utf-8"))
 
 
 def help():
@@ -92,7 +94,8 @@ def create_room():
     owner = True
     while True:
         if exitVar is False:
-            msgout = input("Send: ")
+            # msgout = input("Send: ")
+            msgout = input()
             if msgout.startswith("/"):
                 command = msgout.strip("/")
                 if command in commands:
@@ -117,16 +120,23 @@ def join_room():
     joined = True
     while True:
         if exitVar is False:
-            msgout = input("Send: ")
+            # msgout = input("Send: ")
+            msgout = input()
             if msgout.startswith("/"):
                 command = msgout.strip("/")
                 if command in commands:
                     exec(command + "()")
             else:
+                # print(sock2)
                 if sock2 is not False:
+                    print("send!")
                     sock2.send(msgout.encode("utf-8"))
         else:
             break
+
+
+def leave_room():
+    pass
 
 
 if __name__ == "__main__":
