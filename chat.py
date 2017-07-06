@@ -1,8 +1,10 @@
 import socket
 import threading
 import sys
+import selectors
 # import select
 
+sel = selectors.DefaultSelector()
 Version = "0.0.3"
 ProjectName = "MyChat"
 connection = False
@@ -26,39 +28,69 @@ class Thread(threading.Thread):  # start a Thread to receive the msg
     def run(self):
         exec("self." + self.task + "()")
 
+    def accept(self, sock, mask):
+        global connection
+        connection, addr = sock.accept()
+        print(addr)
+        print(socket.gethostbyaddr(addr[0]), "joined your room")
+        connection.setblocking(False)
+        sel.register(connection, selectors.EVENT_READ, self.read)
+
+    def read(self, connection, mask):
+        data = connection.recv(1024)
+        if data:
+            print(data.decode("utf-8"))
+        else:
+            print("closing", connection)
+            sel.unregister(connection)
+            connection.close()
+
     def create(self):  # receive msg in own room
         sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock1.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # sock1.setblocking(0)
         sock1.bind((self.host, self.port))
         sock1.listen(1)
-        global connection
-        connection, addr = sock1.accept()
+        sock1.setblocking(False)
+        sel.register(sock1, selectors.EVENT_READ, self.accept)
+        # global connection
+        # connection, addr = sock1.accept()
         # print(type(connection))
         global exitVar
-        try:
-            while True:
-                if exitVar is True:
-                    break
-                else:
-                    # print("in running thread", self.id)
-                    # ready = select.select([sock1], [], [])
-                    # print("meh")
-                    # print(ready[0])
-                    # if ready[0]:
-                    #     msg = connection.recv(1024)
-                    #     print(msg.decode("utf-8"))
-                    msg = connection.recv(1024)
-                    if msg.decode("utf-8").endswith("joined your room!"):
-                        print("system:", msg.decode("utf-8"))
-                    else:
-                        print(msg.decode("utf-8"))
-        except ConnectionAbortedError:
-            global owner
-            owner = False
-            print("Thread ", self.id, " is finished")
-        except ConnectionResetError:
-            print("connectionreseterror")
+        while True:
+            events = sel.select()
+            print(events)
+            for key, mask in events:
+                print(key)
+                print(mask)
+                callback = key.data
+                print(callback)
+                print(callback(key.fileobj, mask))
+                callback(key.fileobj, mask)
+
+        # try:
+        #     while True:
+        #         if exitVar is True:
+        #             break
+        #         else:
+        #             # print("in running thread", self.id)
+        #             # ready = select.select([sock1], [], [])
+        #             # print("meh")
+        #             # print(ready[0])
+        #             # if ready[0]:
+        #             #     msg = connection.recv(1024)
+        #             #     print(msg.decode("utf-8"))
+        #             msg = connection.recv(1024)
+        #             if msg.decode("utf-8").endswith("joined your room!"):
+        #                 print("system:", msg.decode("utf-8"))
+        #             else:
+        #                 print(msg.decode("utf-8"))
+        # except ConnectionAbortedError:
+        #     global owner
+        #     owner = False
+        #     print("Thread ", self.id, " is finished")
+        # except ConnectionResetError:
+        #     print("connectionreseterror")
 
     def joinRoom_alt(self):
         global sock2
