@@ -21,7 +21,7 @@ def read(connection, mask):
     if msg:
         print(msg.decode("utf-8"))
     else:
-        print("closeing", connection)
+        print("closing", connection)
         sel.unregister(connection)
         connection.close()
 
