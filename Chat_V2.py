@@ -26,7 +26,6 @@ def test():
                     break
                 callback = key.data
                 callback(key.fileobj, mask)
-        print("end")
     except OSError:
         print("Host closed the room")
 
@@ -45,7 +44,8 @@ def read(connection, mask):
     if msg:
         print(msg.decode("utf-8"))
     else:
-        print("closing", connection)
+        print("closing connection")
+        print("Press <Enter> to continue")
         sel.unregister(connection)
         connection.close()
 
@@ -109,11 +109,21 @@ def send_neu(send_socket):
         pass
 
 
-def join_room():
-    connection = (socket.gethostbyname(socket.gethostname()), 1337)
-    client_socket = socket.create_connection(connection)
-    client_socket.setblocking(False)
-    sel.register(client_socket, selectors.EVENT_READ, read)
+def join_room(addr=None):
+    client_socket = None
+    if addr:
+        try:
+            connection = (addr, 1337)
+            client_socket = socket.create_connection(connection)
+            client_socket.setblocking(False)
+            sel.register(client_socket, selectors.EVENT_READ, read)
+        except Exception:
+            print(Exception)
+    else:
+        connection = (socket.gethostbyname(socket.gethostname()), 1337)
+        client_socket = socket.create_connection(connection)
+        client_socket.setblocking(False)
+        sel.register(client_socket, selectors.EVENT_READ, read)
     threading.Thread(target=test).start()
     send(client_socket)
     # send_neu(client_socket)
@@ -124,7 +134,13 @@ def leave_room():
     stop = True
     print("set stop to True")
 
-commands = {"help": myhelp, "create_room": create_room, "leave_room": leave_room, "join_room": join_room, "exit": exit}
+
+def get_own_address():
+    print("Name:", socket.gethostname())
+    print("IP-Address:", socket.gethostbyname(socket.gethostname()))
+
+
+commands = {"help": myhelp, "create_room": create_room, "leave_room": leave_room, "join_room": join_room, "exit": exit, "address": get_own_address}
 
 if __name__ == "__main__":
     print("Hello welcome to %s!\n Version: %s" % (ProjectName, Version))
@@ -135,6 +151,13 @@ if __name__ == "__main__":
         if data.startswith("/"):
             data = data.strip("/")
             try:
-                commands[data]()
-            except KeyError:
-                print("There is no command named", data)
+                data = data.split(" ")
+                try:
+                    commands[data[0]](data[1])
+                except KeyError:
+                    print("There is no command named", data[0])
+            except IndexError:
+                try:
+                    commands[data[0]]()
+                except KeyError:
+                    print("There is no command named", data[0])
