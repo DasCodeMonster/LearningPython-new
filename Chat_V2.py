@@ -51,7 +51,7 @@ def read(connection, mask):
 
 
 def create_room():
-    connection = ("", 1337)
+    connection = ("0.0.0.0", 1337)
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.bind(connection)
     host_socket.listen(1)
