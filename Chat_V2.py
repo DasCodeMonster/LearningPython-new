@@ -2,11 +2,12 @@ import socket
 import selectors
 import threading
 import msvcrt
+from functools import partial
 
 sel = selectors.DefaultSelector()
 Version = "0.0.3"
 ProjectName = "MyChat"
-
+running = False
 con = False
 stop = False
 
@@ -16,6 +17,8 @@ def myhelp():
 
 
 def test():
+    global running
+    running = True
     try:
         global stop
         while True:
@@ -128,6 +131,26 @@ def send_neu(send_socket):
     except OSError:
         leave_room()
         pass
+
+
+def getmsg(send_socket):
+    msg = None
+    sel.register(msg, selectors.EVENT_READ, partial(sendmsg, send_socket))
+    while True:
+        msg = input()
+        if msg.startswith("/"):
+            command = msg.strip("/")
+            if command == "leave_room":
+                leave_room()
+                send_socket.close()
+                break
+            try:
+                commands[command]()
+            except KeyError:
+                print("There is no command named", command)
+
+def sendmsg(msg, send_socket):
+    send_socket.send(msg.encode("utf-8"))
 
 
 def join_room(addr=None):
