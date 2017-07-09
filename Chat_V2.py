@@ -30,9 +30,12 @@ def test():
         print("Host closed the room")
 
 
-def accept(socket, mask):
-    connection, addr = socket.accept()
+def accept(insocket, mask):
+    connection, addr = insocket.accept()
     print(addr, "joined your room")
+    global addresses
+    addresses.update({addr[0]: addr[1]})
+    print(addresses)
     connection.setblocking(False)
     sel.register(connection, selectors.EVENT_READ, read)
     global con
@@ -51,10 +54,25 @@ def read(connection, mask):
 
 
 def create_room():
-    connection = ("0.0.0.0", 1337)
+    global stop
+    stop = False
+    creator = True
+    print("Create your room:")
+    try:
+        connections = int(input("Members: "))
+        connections -= 1
+    except ValueError:
+        connections = 1
+        print("Not a viable number of members. Number of members is set to 2")
+    try:
+        port = int(input("Port: "))
+        connection = ("o.o.o.o", port)
+    except ValueError:
+        print("Port was not integer.Port is set to standard(1337)")
+        connection = ("0.0.0.0", 1337)
     host_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     host_socket.bind(connection)
-    host_socket.listen(1)
+    host_socket.listen(connections)
     host_socket.setblocking(False)
     sel.register(host_socket, selectors.EVENT_READ, accept)
     threading.Thread(target=test).start()
@@ -62,11 +80,11 @@ def create_room():
         if stop is True:
             break
         if con:
-            send(con)
+            send(con, creator)
             # send_neu(con)
 
 
-def send(send_socket):
+def send(send_socket, creator):
     try:
         while True:
             msg = input()
@@ -81,7 +99,10 @@ def send(send_socket):
                 except KeyError:
                     print("There is no command named", command)
             else:
-                send_socket.send(msg.encode("utf-8"))
+                if creator is True:
+                    global addresses
+                    for key in addresses:
+                        send_socket.send(msg.encode("utf-8"))
     except OSError:
         leave_room()
         pass
@@ -110,29 +131,27 @@ def send_neu(send_socket):
 
 
 def join_room(addr=None):
-    client_socket = None
+    # client_socket = None
+    creator = False
     if addr:
-        try:
-            connection = (addr, 1337)
-            client_socket = socket.create_connection(connection)
-            client_socket.setblocking(False)
-            sel.register(client_socket, selectors.EVENT_READ, read)
-        except Exception:
-            print(Exception)
+        connection = (addr, 1337)
+        client_socket = socket.create_connection(connection)
+        client_socket.setblocking(False)
+        sel.register(client_socket, selectors.EVENT_READ, read)
     else:
         connection = (socket.gethostbyname(socket.gethostname()), 1337)
         client_socket = socket.create_connection(connection)
         client_socket.setblocking(False)
         sel.register(client_socket, selectors.EVENT_READ, read)
     threading.Thread(target=test).start()
-    send(client_socket)
+    send(client_socket, creator)
     # send_neu(client_socket)
 
 
 def leave_room():
     global stop
     stop = True
-    print("set stop to True")
+    # print("set stop to True")
 
 
 def get_own_address():
@@ -140,7 +159,13 @@ def get_own_address():
     print("IP-Address:", socket.gethostbyname(socket.gethostname()))
 
 
-commands = {"help": myhelp, "create_room": create_room, "leave_room": leave_room, "join_room": join_room, "exit": exit, "address": get_own_address}
+def save_shutdown():
+    leave_room()
+    exit()
+
+addresses = {}
+commands = {"help": myhelp, "create_room": create_room, "leave_room": leave_room, "join_room": join_room, "exit": exit,
+            "address": get_own_address}
 
 if __name__ == "__main__":
     print("Hello welcome to %s!\n Version: %s" % (ProjectName, Version))
