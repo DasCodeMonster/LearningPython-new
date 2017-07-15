@@ -3,17 +3,19 @@ import zipfile
 from PIL import Image, ExifTags
 import webcolors
 import string
+
+
 def level6():
     comments = []
     try:
         d = 90052
         while True:
-            with zipfile.ZipFile("channel.zip") as zip:
-                with zip.open(str(d) + ".txt") as f:
+            with zipfile.ZipFile("channel.zip") as fzip:
+                with fzip.open(str(d) + ".txt") as f:
                     for line in f:
                         d = re.findall(b"\d+", line)[0].decode("utf-8")
                         print(d)
-                        comments.append((zip.getinfo(str(d) + ".txt").comment).decode("utf-8"))
+                        comments.append((fzip.getinfo(str(d) + ".txt").comment).decode("utf-8"))
     except IndexError:
         print("comments: ", len(comments))
         print(comments)
@@ -80,22 +82,26 @@ def level7():
     global colorcodes
     png = Image.open("oxygen.png")
     pix = png.load()
+    coords = []
     for i in range(1, 607):
         color = pix[i, 47]
         colorcodes.append(color)
+        coord = (i, 47)
+        coords.append(coord)
         name, closest_name = get_colour_name(color)
         colors.append(name)
         closest.append(closest_name)
     print(colors)
     print(closest)
-    colors = set(colors)
-    closest = set(closest)
-    print(colors)
-    print(closest)
+    setcolors = set(colors)
+    setclosest = set(closest)
+    print(setcolors)
+    print(setclosest)
     print(colorcodes)
-    colorcodes = set(colorcodes)
-    print(colorcodes)
-    print(len(colorcodes))
+    setcolorcodes = set(colorcodes)
+    print(setcolorcodes)
+    print(len(setcolorcodes))
+    print(coords)
 
 def closest_colour(requested_colour):
     min_colours = {}
@@ -116,15 +122,25 @@ def get_colour_name(requested_colour):
     return actual_name, closest_name
 
 def resize_img():
- img = Image.open("oxygen.png")
- pix = img.load()
- print(img.size)
- x, y = img.size
- for i in range(1, y):
-     for v in range(1, x):
+    xlist = []
+    ylist = []
+    img = Image.open("oxygen.png")
+    pix = img.load()
+    print(img.size)
+    x, y = img.size
+    for i in range(1, 95):
+     for v in range(1, 607):
          color = pix[v, i]
-         if color in colorcodes:
-             print("x: ", v, "y: ", i)
+         if color in colorcodes and i is not 20:
+             xlist.append(v)
+             ylist.append(i)
+             # print("x: ", v, "y: ", i)
+    setxlist = set(xlist)
+    setylist = set(ylist)
+    print(setxlist)
+    print(setylist)
+
+
 
 if __name__ == "__main__":
     print(string.ascii_letters[29])
