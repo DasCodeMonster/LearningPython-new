@@ -3,6 +3,7 @@ import zipfile
 from PIL import Image, ExifTags
 import webcolors
 import string
+import encodings
 
 
 def level6():
@@ -83,7 +84,7 @@ def level7():
     png = Image.open("oxygen.png")
     pix = png.load()
     coords = []
-    for i in range(1, 607):
+    for i in range(4, 607, 7):
         color = pix[i, 47]
         colorcodes.append(color)
         coord = (i, 47)
@@ -91,17 +92,28 @@ def level7():
         name, closest_name = get_colour_name(color)
         colors.append(name)
         closest.append(closest_name)
-    print(colors)
-    print(closest)
+    # print(colors)
+    # print(closest)
     setcolors = set(colors)
     setclosest = set(closest)
-    print(setcolors)
-    print(setclosest)
-    print(colorcodes)
+    # print(setcolors)
+    # print(setclosest)
+    # print(colorcodes)
     setcolorcodes = set(colorcodes)
-    print(setcolorcodes)
-    print(len(setcolorcodes))
-    print(coords)
+    # print(setcolorcodes)
+    # print(len(setcolorcodes))
+    # print(coords)
+    letters = []
+    text = ""
+    for codes in colorcodes:
+        letters.append(chr(codes[0]))
+    for letter in letters:
+        text += letter
+    print(text)
+    nums = re.findall("\d+", text)
+    print(nums)
+    for num in nums:
+        print(chr(int(num)))
 
 def closest_colour(requested_colour):
     min_colours = {}
@@ -126,7 +138,7 @@ def resize_img():
     ylist = []
     img = Image.open("oxygen.png")
     pix = img.load()
-    print(img.size)
+    # print(img.size)
     x, y = img.size
     for i in range(1, 95):
      for v in range(1, 607):
@@ -137,12 +149,29 @@ def resize_img():
              # print("x: ", v, "y: ", i)
     setxlist = set(xlist)
     setylist = set(ylist)
-    print(setxlist)
-    print(setylist)
+    # print(setxlist)
+    # print(setylist)
+    imgbytes = img.tobytes()
+    # imgbitmap = img.tobitmap()
+    # print(imgbytes)
+    # print(imgbytes.decode("raw"))
+    # print(imgbitmap)
+    res = pix[4, 47]
+    print(res)
+    print(res[0])
+    print(chr(res[0]))
 
+
+def level8():
+    # un: 'BZh91AY&SYA\xaf\x82\r\x00\x00\x01\x01\x80\x02\xc0\x02\x00 \x00!\x9ah3M\x07<]\xc9\x14\xe1BA\x06\xbe\x084'
+    # pw: 'BZh91AY&SY\x94$|\x0e\x00\x00\x00\x81\x00\x03$ \x00!\x9ah3M\x13<]\xc9\x14\xe1BBP\x91\xf08'
+
+    usernameen = 'BZh91AY&SYA\xaf\x82\r\x00\x00\x01\x01\x80\x02\xc0\x02\x00 \x00!\x9ah3M\x07<]\xc9\x14\xe1BA\x06\xbe\x084'
+    passworden = "BZh91AY&SY\x94$|\x0e\x00\x00\x00\x81\x00\x03$ \x00!\x9ah3M\x13<]\xc9\x14\xe1BBP\x91\xf08"
+    # usernamede = usernameen.decode("")
+    for encoding in encodings.:
+        print(encoding)
 
 
 if __name__ == "__main__":
-    print(string.ascii_letters[29])
-    level7()
-    resize_img()
+    level8()
