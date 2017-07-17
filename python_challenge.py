@@ -6,6 +6,7 @@ import string
 import encodings
 import codecs
 import sys
+import itertools as it
 
 
 def level6():
@@ -312,18 +313,63 @@ def level9():
 
 def level10():
     #  a = [1, 11, 21, 1211, 111221,...
-    zahl = "1221"
-    ergebnis = re.findall("\d", zahl)
-    count = 0
-    a = []
-    for i in ergebnis:
-        if count == 0:
-            a.append(i)
-        if count > 0:
-            if i == ergebnis[count-1]:
-                a.append(i)
-        count += 1
-    print(a)
+    # zahl = "1221"
+    # ergebnis = re.findall("\d", zahl)
+    # count = 0
+    # a = []
+    # for i in ergebnis:
+    #     if count == 0:
+    #         a.append(i)
+    #     if count > 0:
+    #         if i == ergebnis[count-1]:
+    #             a.append(i)
+    #     count += 1
+    # print(a)
+    zahl = "1"
+    for i in range(0, 30):
+        test = []
+        for j, g in it.groupby(zahl):
+            # print(j)
+            # print(list(g))
+            a = list(g)
+            # print(a)
+            length = len(a)
+            test.append(str(length) + j)
+        # print(test)
+        zahl = ""
+        for i in test:
+            # print(i)
+            zahl += i
+    print("Ergebnis: ", zahl)
+    print(len(zahl))
+    #  5808
+
+
+def level11():
+    img = Image.open("cave.jpg")
+    info = img.info
+    print(info)
+    pix = img.load()
+    raw = img.tobytes()
+    print(raw)
+    colors = img.getcolors(1000000)
+    print(len(colors))
+    print(len(colors)/2)
+    data = img.getdata()
+    print(list(data))
+    print("before")
+    for i, j in img._getexif().items():
+        if i in ExifTags.TAGS:
+            print(ExifTags.TAGS[i] + " - " + str(j))
+        else:
+            print("No Tag")
+    print("after")
+    # test = img.split()
+    # print(test)
+    # for img in test:
+    #     img.show()
+
+
 
 if __name__ == "__main__":
-    level10()
+    level11()
