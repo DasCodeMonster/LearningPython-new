@@ -1,11 +1,8 @@
 import re
 import zipfile
-from PIL import Image, ExifTags, ImageDraw
+from PIL import Image, ExifTags, ImageDraw, ImageGrab, ImageEnhance, ImageOps
 import webcolors
-import string
-import encodings
 import codecs
-import sys
 import itertools as it
 
 
@@ -351,12 +348,25 @@ def level11():
     print(info)
     pix = img.load()
     raw = img.tobytes()
-    print(raw)
+    # print(raw)
     colors = img.getcolors(1000000)
     print(len(colors))
     print(len(colors)/2)
+    odd = []
+    even = []
     data = img.getdata()
-    print(list(data))
+    # print(data)
+    # print(list(data))
+    # for val in list(data):
+    #     if val%2 == 0:
+    #         even.append(val)
+    #     else:
+    #         odd.append(val)
+    print("Ungerade:")
+    print(odd)
+    print("Gerade:")
+    print(even)
+    # print(list(data))
     print("before")
     for i, j in img._getexif().items():
         if i in ExifTags.TAGS:
@@ -364,12 +374,46 @@ def level11():
         else:
             print("No Tag")
     print("after")
+    bands = img.getbands()
+    # print(bands)
+    histogram = img.histogram()
+    print(histogram)
+    for val in histogram:
+        if val%2 == 0:
+            even.append(val)
+        else:
+            odd.append(val)
+    print("Gerade:")
+    print(even)
+    print(len(even))
+    print("Ungerade:")
+    print(odd)
+    print(len(odd))
+    img.putdata(even)
+    img.save("even.jpg")
+    img.show("even")
+    img.putdata(odd)
+    img.save("odd.jpg")
+    img.show("odd")
+    # tell = img.tell()
+    # print(tell)
     # test = img.split()
     # print(test)
     # for img in test:
     #     img.show()
-
-
+    screenshot = ImageGrab.grab()
+    # screenshot.show("PythonScreenShot")
+    enhancer = ImageEnhance.Sharpness(img)
+    # for i in range(8):
+    #     factor = i/4
+    #     enhancer.enhance(factor).show("sharpness %f" % factor)
+    # invert = ImageOps.invert(img)
+    # invert.show()
+    # split = invert.split()
+    # for i in split:
+    #     i.show()
+    # contrast = ImageOps.autocontrast(img)
+    # contrast.show()
 
 if __name__ == "__main__":
     level11()
