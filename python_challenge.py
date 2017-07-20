@@ -390,11 +390,11 @@ def level11():
     print(odd)
     print(len(odd))
     img.putdata(even)
-    img.save("even.jpg")
-    img.show("even")
+    # img.save("even.jpg")
+    # img.show("even")
     img.putdata(odd)
-    img.save("odd.jpg")
-    img.show("odd")
+    # img.save("odd.jpg")
+    # img.show("odd")
     # tell = img.tell()
     # print(tell)
     # test = img.split()
@@ -414,6 +414,88 @@ def level11():
     #     i.show()
     # contrast = ImageOps.autocontrast(img)
     # contrast.show()
+    size = (int(img.size[0]/2), int(img.size[1]/2))
+    img1 = Image.new("RGB", size)
+    pixnew = img1.load()
+    print(img.size)
+    print(img1.size)
+    count = 0
+    pixel_1 = []
+    coords_1 = []
+    pixel_2 = []
+    coords_2 = []
+    for y in range(img.size[1]):
+        for x in range(img.size[0]):
+            if count%2 == 0:
+                pixel_1.append(pix[x, y])
+                coords_1.append((x, y))
+                # print(1)
+            else:
+                pixel_2.append(pix[x, y])
+                coords_2.append((x, y))
+                # print(0)
+            count += 1
+    print(len(pixel_1))
+    print(len(coords_1))
+    print(len(pixel_2))
+    print(len(coords_2))
+    print(img1.size[0]*img1.size[1])
+    print(img.size[0]*img.size[1])
+    count = 0
+    for y in range(img1.size[1]):
+        for x in range(img1.size[0]):
+            pixnew[x, y] = pixel_2[count]
+            count += 1
+    img1.show()
+    pixel = img.getpixel((1, 1))
+    pix_1 = []
+    pix_2 = []
+    pix_3 = []
+    with open("pixel1", "w") as f:
+        f.write("[")
+        for y in range(img.size[1]):
+            for x in range(img.size[0]):
+                pix_1.append(img.getpixel((x, y))[0])
+                if y is img.size[1]-1 and x is img.size[0]-1:
+                    print("hey")
+                f.write(str(img.getpixel((x, y))[0]) + ",")
+                # print(img.getpixel((x, y))[0])
+                pix_2.append(img.getpixel((x, y))[1])
+                # print(img.getpixel((x, y))[1])
+                pix_3.append(img.getpixel((x, y))[2])
+                # print(img.getpixel((x, y))[2])
+        f.write("]")
+    print(len(pix_1))
+    print(len(pix_2))
+    print(len(pix_3))
+    x, y = 0, 0
+    print(img.size[0])
+    for pixel in pix_1:
+        img.putpixel((x, y), pixel)
+        if x == img.size[0]-1:
+            x = 0
+            y += 1
+        else:
+            x += 1
+    img.show()
+    x, y = 0, 0
+    for pixel in pix_2:
+        img.putpixel((x, y), pixel)
+        if x == img.size[0]-1:
+            x = 0
+            y += 1
+        else:
+            x += 1
+    img.show()
+    x, y = 0, 0
+    for pixel in pix_2:
+        img.putpixel((x, y), pixel)
+        if x == img.size[0]-1:
+            x = 0
+            y += 1
+        else:
+            x += 1
+    img.show()
 
 if __name__ == "__main__":
     level11()
