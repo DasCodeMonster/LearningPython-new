@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget
+import PyQt5.QtWidgets
 import sys
 
 
